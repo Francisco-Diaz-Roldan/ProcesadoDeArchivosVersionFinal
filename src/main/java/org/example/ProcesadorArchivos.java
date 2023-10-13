@@ -12,7 +12,7 @@ public class ProcesadorArchivos {
             String lecturaArchivo;
             int numeroLinea = 0; // Variable para el número de línea
             while ((lecturaArchivo = brArchivo.readLine()) != null) {
-                numeroLinea++; // Incrementa el número de línea
+                numeroLinea++; // Incrementa el número de la línea
 
                 boolean datosCompletos = true; // Variable para controlar si todos los datos están completos
                 String[] datosArchivo = lecturaArchivo.split(",");
