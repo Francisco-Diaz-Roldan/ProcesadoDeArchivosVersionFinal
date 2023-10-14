@@ -3,8 +3,21 @@ package org.example;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Esta clase contiene varios métodos con los que es posible crear una carpeta "salida" que crea documentos
+ * "correoBienvenida.txt" a partir de unos datos sacdos de "data.csv" y empleando una plantilla "template.txt".
+ * Además, comprueba que no falten archivos o datos en los mismos.
+ */
+
 public class ProcesadorArchivos {
 
+    /***
+     *Permite procesar los archivos "data.csv" y "template.txt" para generar los nuevos archivos de texto
+     * "correoBienvenida.txt" que aparecerán en la carpeta "salida".
+     *
+     * @param archivoCsv        Se trata de la ruta al archivo de entrada "data.csv".
+     * @param archivoPlantilla  Se trata de la ruta al archivo de plantilla "template.txt".
+     */
     public static void procesadorArchivos(String archivoCsv, String archivoPlantilla) {
         File archivo = new File(archivoCsv);
         File plantilla = new File(archivoPlantilla);
@@ -35,14 +48,17 @@ public class ProcesadorArchivos {
             throw new RuntimeException("Error al leer el archivo de obtención de datos " + e);
         }
 
-        imprimirArchivosCorreoBienvenida();
+        //LLamo a la función que crea los correos de salida con los datos ya cambiados
+        //imprimirArchivosCorreoBienvenida();
     }
 
     private static void procesarLinea(String linea, int numeroLinea, String archivoPlantilla, boolean carpetaCreada) {
-        boolean todosDatos = true; // Variable para controlar si todos los datos están completos
+        boolean todosDatos = true; // Creo una variable para compribar que están todos los datos
         String[] datosArchivo = linea.split(",");
-        ArrayList<String> elementosFaltantes = new ArrayList<>();
+        // Creo un ArrayList en el que voy añadiendo los datos que faltan en el data.csv
+        ArrayList<String> datosFaltantes = new ArrayList<>();
 
+        //Voy asignanco valores a los datos que han sido separados mediante comas
         if (datosArchivo.length >= 5) {
             String id = datosArchivo[0];
             String empresa = datosArchivo[1];
@@ -50,23 +66,23 @@ public class ProcesadorArchivos {
             String email = datosArchivo[3];
             String empleado = datosArchivo[4];
 
-            if (id.isEmpty()) elementosFaltantes.add("id");
-            if (empresa.isEmpty()) elementosFaltantes.add("empresa");
-            if (ciudad.isEmpty()) elementosFaltantes.add("ciudad");
-            if (email.isEmpty()) elementosFaltantes.add("email");
-            if (empleado.isEmpty()) elementosFaltantes.add("empleado");
+            if (id.isEmpty()) datosFaltantes.add("id");
+            if (empresa.isEmpty()) datosFaltantes.add("empresa");
+            if (ciudad.isEmpty()) datosFaltantes.add("ciudad");
+            if (email.isEmpty()) datosFaltantes.add("email");
+            if (empleado.isEmpty()) datosFaltantes.add("empleado");
 
-            if (elementosFaltantes.isEmpty()) {
+            if (datosFaltantes.isEmpty()) {
                 ArrayList<String> plantillas = cargarPlantillas(archivoPlantilla, ciudad, email, empresa, empleado,
                         todosDatos);
 
                 if (todosDatos) {
                     escribirCorreoBienvenida(id, plantillas);
                 } else {
-                    imprimirErrorDatosFaltantes(numeroLinea, elementosFaltantes);
+                    imprimirErrorDatosFaltantes(numeroLinea, datosFaltantes);
                 }
             } else {
-                imprimirErrorDatosFaltantes(numeroLinea, elementosFaltantes);
+                imprimirErrorDatosFaltantes(numeroLinea, datosFaltantes);
             }
         } else {
             imprimirErrorDatosFaltantes(numeroLinea, null);
@@ -79,6 +95,7 @@ public class ProcesadorArchivos {
         try (BufferedReader brPlantilla = new BufferedReader(new FileReader(archivoPlantilla))) {
             String lecturaPlantilla;
             while ((lecturaPlantilla = brPlantilla.readLine()) != null) {
+                //Sustituimos los %%n%% por los valores almacenados anteriormente
                 lecturaPlantilla = lecturaPlantilla.replace("%%2%%", ciudad);
                 lecturaPlantilla = lecturaPlantilla.replace("%%3%%", email);
                 lecturaPlantilla = lecturaPlantilla.replace("%%4%%", empresa);
@@ -86,8 +103,8 @@ public class ProcesadorArchivos {
                 plantillas.add(lecturaPlantilla + "\n");
 
                 if (lecturaPlantilla.contains("%%")) {
-                    todosDatos = false; // Si hay cosas sin reemplazar, establece todosDatos a false
-                    break; // Sale del bucle si falta algo
+                    todosDatos = false; // Si quedan cosas sin reemplazar en la plantilla, establece todosDatos a false
+                    break; // El pograma ale del bucle si falta algo
                 }
             }
         } catch (IOException e) {
@@ -102,6 +119,7 @@ public class ProcesadorArchivos {
         System.out.println("Se ha creado correctamente la carpeta salida:");
     }
 
+    //Creo los archivos con la información sustituida de las plantillas en la carpeta salida y lo imprimo por pantalla
     private static void escribirCorreoBienvenida(String id, ArrayList<String> plantillas) {
         try (BufferedWriter correoBienvenida = new BufferedWriter(new FileWriter("salida/correoBienvenida-"
                 + id + ".txt"))) {
@@ -114,15 +132,18 @@ public class ProcesadorArchivos {
         }
     }
 
-    private static void imprimirErrorDatosFaltantes(int numeroLinea, ArrayList<String> elementosFaltantes) {
+    //Para control de errores
+    //Imprimo por pantalla un mensaje de error indicando los datos que faltan en data.csv  y la línea en la que faltan
+    private static void imprimirErrorDatosFaltantes(int numeroLinea, ArrayList<String> datosFaltantes) {
         String mensajeError = "Error: Faltan datos en la línea " + numeroLinea;
-        if (elementosFaltantes != null) {
-            mensajeError += ", falta: " + String.join(", ", elementosFaltantes);
+        if (datosFaltantes != null) {
+            mensajeError += ", falta: " + String.join(", ", datosFaltantes);
         }
         System.err.println(mensajeError + " en el archivo data.csv");
     }
 
-    private static void imprimirArchivosCorreoBienvenida() {
+    //Imprimo el contenido de las plantillas con la información sustituida por consola
+    /*private static void imprimirArchivosCorreoBienvenida() {
         File salida = new File("salida");
         if (salida.exists() && salida.isDirectory()) {
             File[] archivosCorreoBienvenida = salida.listFiles((dir, name) -> name.startsWith("correoBienvenida-")
@@ -136,7 +157,7 @@ public class ProcesadorArchivos {
                 } catch (IOException e) {
                     throw new RuntimeException("Error al leer el archivo de salida " + e);
                 }
-            }*/
+            }
         }
-    }
+    }*/
 }
