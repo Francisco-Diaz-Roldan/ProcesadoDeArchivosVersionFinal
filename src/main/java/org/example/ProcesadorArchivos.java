@@ -7,14 +7,28 @@ public class ProcesadorArchivos {
 
     public static void procesadorArchivos(String archivoCsv, String archivoPlantilla) {
         File archivo = new File(archivoCsv);
+        File plantilla = new File(archivoPlantilla);
+
+        // Compruebo que existe el archivo data.csv
+        if (!archivo.exists()) {
+            System.err.println("Error: archivo data.csv no encontrado.");
+            return; // Manejo el error y salgo del método en caso de que no exista
+        }
+
+        // Compruebo que existe el archivo  template.txt
+        if (!plantilla.exists()) {
+            System.err.println("Error: archivo template.txt no encontrado.");
+            return; // Manejo el error y salgo del método en caso de que no exista
+        }
+
         boolean carpetaCreada = false;
-        crearCarpetaSalida(); // Llamar a la creación de la carpeta fuera del bucle
+        crearCarpetaSalida(); // Llamo a la función que crea la carpeta salida
 
         try (BufferedReader brArchivo = new BufferedReader(new FileReader(archivo))) {
             String lecturaArchivo;
-            int linea = 0; // Variable para el número de línea
+            int linea = 0; // Creo una variable para calcular después el número de la línea del archivo
             while ((lecturaArchivo = brArchivo.readLine()) != null) {
-                linea++; // Incrementa el número de la línea
+                linea++;
                 procesarLinea(lecturaArchivo, linea, archivoPlantilla, carpetaCreada);
             }
         } catch (IOException e) {
@@ -43,7 +57,8 @@ public class ProcesadorArchivos {
             if (empleado.isEmpty()) elementosFaltantes.add("empleado");
 
             if (elementosFaltantes.isEmpty()) {
-                ArrayList<String> plantillas = cargarPlantillas(archivoPlantilla, ciudad, email, empresa, empleado, todosDatos);
+                ArrayList<String> plantillas = cargarPlantillas(archivoPlantilla, ciudad, email, empresa, empleado,
+                        todosDatos);
 
                 if (todosDatos) {
                     escribirCorreoBienvenida(id, plantillas);
@@ -58,7 +73,8 @@ public class ProcesadorArchivos {
         }
     }
 
-    private static ArrayList<String> cargarPlantillas(String archivoPlantilla, String ciudad, String email, String empresa, String empleado, boolean todosDatos) {
+    private static ArrayList<String> cargarPlantillas(String archivoPlantilla, String ciudad, String email,
+                                                      String empresa, String empleado, boolean todosDatos) {
         ArrayList<String> plantillas = new ArrayList<>();
         try (BufferedReader brPlantilla = new BufferedReader(new FileReader(archivoPlantilla))) {
             String lecturaPlantilla;
@@ -80,14 +96,15 @@ public class ProcesadorArchivos {
         return plantillas;
     }
 
-    private static void crearCarpetaSalida() {
+    private static void crearCarpetaSalida() {//Creo la carpeta salida en caso de que no exista
         File salida = new File("salida");
         salida.mkdir();
         System.out.println("Se ha creado correctamente la carpeta salida:");
     }
 
     private static void escribirCorreoBienvenida(String id, ArrayList<String> plantillas) {
-        try (BufferedWriter correoBienvenida = new BufferedWriter(new FileWriter("salida/correoBienvenida-" + id + ".txt"))) {
+        try (BufferedWriter correoBienvenida = new BufferedWriter(new FileWriter("salida/correoBienvenida-"
+                + id + ".txt"))) {
             for (String nuevaPlantilla : plantillas) {
                 correoBienvenida.write(nuevaPlantilla);
             }
@@ -108,7 +125,8 @@ public class ProcesadorArchivos {
     private static void imprimirArchivosCorreoBienvenida() {
         File salida = new File("salida");
         if (salida.exists() && salida.isDirectory()) {
-            File[] archivosCorreoBienvenida = salida.listFiles((dir, name) -> name.startsWith("correoBienvenida-") && name.endsWith(".txt"));
+            File[] archivosCorreoBienvenida = salida.listFiles((dir, name) -> name.startsWith("correoBienvenida-")
+                    && name.endsWith(".txt"));
             /*for (File archivoCorreo : archivosCorreoBienvenida) {
                  try (BufferedReader brCorreo = new BufferedReader(new FileReader(archivoCorreo))) {
                    String linea;
