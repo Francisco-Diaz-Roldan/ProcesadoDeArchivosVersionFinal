@@ -52,6 +52,13 @@ public class ProcesadorArchivos {
         //imprimirArchivosCorreoBienvenida();
     }
 
+    /***
+     * Procesa cada linea de texto del archivo "data.csv".
+     * @param linea             Linea de texto del archivo "data.csv".
+     * @param numeroLinea       Número de la línea de texto procesada.
+     * @param archivoPlantilla  Ruta al archivo plantilla "template.txt".
+     * @param carpetaCreada     Indica si la carpteta "salida" ha sido creada.
+     */
     private static void procesarLinea(String linea, int numeroLinea, String archivoPlantilla, boolean carpetaCreada) {
         boolean todosDatos = true; // Creo una variable para compribar que están todos los datos
         String[] datosArchivo = linea.split(",");
@@ -89,6 +96,17 @@ public class ProcesadorArchivos {
         }
     }
 
+    /***
+     * Carga la plantilla "template.txt" y sustituye las variables.
+     *
+     * @param archivoPlantilla      Ruta al archivo plantilla "template.txt".
+     * @param ciudad                Valor de la variable "%%2%%", obtenido de la posición [2] de "data.csv".
+     * @param email                 Valor de la variable "%%3%%", obtenido de la posición [3] de "data.csv".
+     * @param empresa               Valor de la variable "%%4%%", obtenido de la posición [1] de "data.csv".
+     * @param empleado              Valor de la variable "%%5%%", obtenido de la posición [4] de "data.csv".
+     * @param todosDatos            Indica si están todos los datos en "data.csv".
+     * @return                      Devuelve la lista con las plantillas procesadas "correoBienvenida.txt".
+     */
     private static ArrayList<String> cargarPlantillas(String archivoPlantilla, String ciudad, String email,
                                                       String empresa, String empleado, boolean todosDatos) {
         ArrayList<String> plantillas = new ArrayList<>();
@@ -113,12 +131,23 @@ public class ProcesadorArchivos {
         return plantillas;
     }
 
+    /***
+     * Crea una carpeta "salida" en caso de que no exista.
+     */
     private static void crearCarpetaSalida() {//Creo la carpeta salida en caso de que no exista
         File salida = new File("salida");
         salida.mkdir();
         System.out.println("Se ha creado correctamente la carpeta salida:");
     }
 
+
+    /***
+     * Escribe los archivos "correoBienvenida.txt" con la información sustituida de las plantillas "template.txt" en la
+     * carpeta salida y lo confirma por pantalla.
+     *
+     * @param id            Identificador del "correoBienvenida.txt", obtenido de la posición [0] de "data.csv".
+     * @param plantillas    Lista con el contenido de los "correosBienvenida.txt".
+     */
     //Creo los archivos con la información sustituida de las plantillas en la carpeta salida y lo imprimo por pantalla
     private static void escribirCorreoBienvenida(String id, ArrayList<String> plantillas) {
         try (BufferedWriter correoBienvenida = new BufferedWriter(new FileWriter("salida/correoBienvenida-"
@@ -131,6 +160,14 @@ public class ProcesadorArchivos {
             throw new RuntimeException("Error al escribir el archivo de salida " + e);
         }
     }
+
+
+    /***
+     *  Imprime mensajes de error en caso de que falten datos en el archivo "data.csv".
+     *
+     * @param numeroLinea       Indica el número de línea en la que faltan datos.
+     * @param datosFaltantes    Indica la lista de nombres en la que faltan datos.
+     */
 
     //Para control de errores
     //Imprimo por pantalla un mensaje de error indicando los datos que faltan en data.csv  y la línea en la que faltan
