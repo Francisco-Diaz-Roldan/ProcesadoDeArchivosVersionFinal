@@ -62,10 +62,10 @@ public class ProcesadorArchivos {
     private static void procesarLinea(String linea, int numeroLinea, String archivoPlantilla, boolean carpetaCreada) {
         boolean todosDatos = true; // Creo una variable para compribar que están todos los datos
         String[] datosArchivo = linea.split(",");
-        // Creo un ArrayList en el que voy añadiendo los datos que faltan en el data.csv
+        // Creo un ArrayList en el que voy añadiendo los datos que faltan en data.csv
         ArrayList<String> datosFaltantes = new ArrayList<>();
 
-        //Voy asignanco valores a los datos que han sido separados mediante comas
+        //Voy asignando valores a los datos que han sido separados mediante comas
         if (datosArchivo.length >= 5) {
             String id = datosArchivo[0];
             String empresa = datosArchivo[1];
@@ -122,15 +122,12 @@ public class ProcesadorArchivos {
 
                 if (lecturaPlantilla.contains("%%")) {
                     todosDatos = false; // Si quedan cosas sin reemplazar en la plantilla, establece todosDatos a false
+                    System.err.println("Error: Marcador inválido en la línea.");
                     break; // El pograma ale del bucle si falta algo
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Error al leer el archivo de la plantilla " + e);
-        }
-
-        if (!todosDatos) {
-            System.err.println("Error: No se han utilizado todos los marcadores de la plantilla.");
         }
         return plantillas;
     }
@@ -159,7 +156,7 @@ public class ProcesadorArchivos {
             for (String nuevaPlantilla : plantillas) {
                 correoBienvenida.write(nuevaPlantilla);
             }
-            System.out.println("Se ha creado correctamente el correoBienvenida-" + id + ".txt");
+            System.out.println("Se ha creado el correoBienvenida-" + id + ".txt");
         } catch (IOException e) {
             throw new RuntimeException("Error al escribir el archivo de salida " + e);
         }
