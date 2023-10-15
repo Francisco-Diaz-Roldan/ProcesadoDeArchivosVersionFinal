@@ -39,7 +39,7 @@ public class ProcesadorArchivos {
 
         try (BufferedReader brArchivo = new BufferedReader(new FileReader(archivo))) {
             String lecturaArchivo;
-            int linea = 0; // Creo una variable para calcular después el número de la línea del archivo
+            int linea = 0; // Creo una variable para calcular el número de la línea del archivo
             while ((lecturaArchivo = brArchivo.readLine()) != null) {
                 linea++;
                 procesarLinea(lecturaArchivo, linea, archivoPlantilla, carpetaCreada);
@@ -127,6 +127,10 @@ public class ProcesadorArchivos {
             }
         } catch (IOException e) {
             throw new RuntimeException("Error al leer el archivo de la plantilla " + e);
+        }
+
+        if (!todosDatos) {
+            System.err.println("Error: No se han utilizado todos los marcadores de la plantilla.");
         }
         return plantillas;
     }
